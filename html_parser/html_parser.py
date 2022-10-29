@@ -110,6 +110,13 @@ class html_element(object):
             if attr.get(key): return attr.get(key)
         return None
 
+    def check(self, tag_name, attr_name, attr_value):
+        if self.check_tagname(tag_name): return self.get_attr(attr_name) == attr_value
+
+    def check_tagname(self,name):
+        if self.type() == element_type.begin or self.type() == element_type.begin_end: return self.name() == name
+        return False
+
     def check_id(self, id): return self.get_attr("id") == id
 
     def tag_string(self):
@@ -184,6 +191,22 @@ class html_node(object):
             if child.find_by_id(id): return child.find_by_id(id)
         return None
 
+    def get(self,tag_name,attr_name,attr_value):
+        array = []
+        if not tag_name: return array
+        if self.element().check(tag_name,attr_name,attr_value): array.append(self)
+        for child in self.childs():
+            for element in child.get(tag_name,attr_name,attr_value): array.append(element)
+        return array
+
+    def get_by_tagname(self,name):
+        array= []
+        if not name: return array
+        if self.element().check_tagname(name): array.append(self)
+        for child in self.childs():
+            for element in child.get_by_tagname(name): array.append(element)
+        return array
+
     def get_by_attr(self,name,value):
         array = []
         if self.element().get_attr(name) == value: array.append(self)
@@ -212,7 +235,7 @@ if __name__ == '__main__':
     root = html_root.read("./get-started.html")
     if root:
         root.debug_print()
-        results = root.get_by_attr("href","_signin.html")
+        results = root.get("div","id","fig1")
         for result in results: print(result.element().element_string())
     debug.end()
     
