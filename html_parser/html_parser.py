@@ -214,6 +214,16 @@ class html_node(object):
             for element in child.get_by_attr(name,value): array.append(element)
         return array
 
+    def elements_string(self,insert_tab=False):
+        array = []
+        tab = ''
+        if insert_tab:
+            for i in range(self.level()-1): tab = tab + '  '
+        array.append(tab + self.element().element_string())
+        for child in self.childs():
+            for element in child.elements_string(insert_tab): array.append(element)
+        return array
+
     def debug_print(self):
         if self.element(): self.element().debug_print(nest=self.level()-1)
         for child in self.childs(): child.debug_print()
@@ -225,6 +235,11 @@ class html_root(html_node):
         super().__init__(html_element(""))
         self.parse_child(html_element(string))
 
+    def write(self,file):
+        with open(file,'w',encoding='UTF-8') as f:
+            f.write('\n'.join(self.elements_string(insert_tab=True)))
+            f.close()
+
     @classmethod
     def read(cls, file):
         with open(file) as f: return cls(f.read())
@@ -233,9 +248,6 @@ class html_root(html_node):
 if __name__ == '__main__':
     debug.start("html_parser.debug")
     root = html_root.read("./get-started.html")
-    if root:
-        root.debug_print()
-        results = root.get("div","id","fig1")
-        for result in results: print(result.element().element_string())
+    if root: root.write("foo.html")
     debug.end()
     

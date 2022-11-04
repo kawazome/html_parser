@@ -1,2 +1,2 @@
 from html_parser.html_parser import *
-__version__ = '1.0.0'
+__version__ = '1.0.2'
